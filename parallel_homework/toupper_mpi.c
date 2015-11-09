@@ -15,7 +15,7 @@
 char* map_file(char *filename, int *length_out) 
 {
 	struct stat file_stat;
-	int fd = open(filename, O_RDWR);
+	int fd = open(filename, O_RDONLY);
 	if (fd == -1) 
 	{
 		printf("failed to open file: %s\n", filename); 
@@ -27,7 +27,7 @@ char* map_file(char *filename, int *length_out)
 		exit(1);
 	}
 	off_t length = file_stat.st_size;
-	void *file = mmap(0, length, PROT_WRITE, MAP_SHARED, fd, 0);
+	void *file = mmap(0, length, PROT_WRITE, MAP_PRIVATE, fd, 0);
 	if (file == (void *)-1) 
 	{
 		printf("failed to mmap file: %s\n", filename); 
@@ -40,7 +40,9 @@ char* map_file(char *filename, int *length_out)
 
 int main(int argc, char *argv[]) 
 {
-	int rank, size;
+	//size=command line param
+	int rank;
+	int size;
 	double max_time;
 
 	MPI_Init( &argc, &argv );
@@ -52,7 +54,21 @@ int main(int argc, char *argv[])
 
 	double start = MPI_Wtime();
 
+	//printf("Size: %d Rank: %d\n", size, rank);
+
+	//char buffer[100];
+
 	// Your code here!
+	MPI_Status stat;
+	int number;
+	for(int i=0; i<size; i++){
+		if(i==rank){
+			for(int j=i*length/size; j<(i+1)*length/size; j++){
+				file[j]=toupper(file[j]);
+			}
+		}
+	}
+	
 
 	double my_time = MPI_Wtime() - start;
 	MPI_Reduce(&my_time, &max_time, 1, MPI_DOUBLE, MPI_MAX, 0, MPI_COMM_WORLD);

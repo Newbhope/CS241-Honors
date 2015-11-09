@@ -41,13 +41,21 @@ char* map_file(char *filename, int *length_out)
 
 int main(int argc, char *argv[]) 
 {
+	#pragma omp parallel num_threads(16)
+	omp_set_num_threads(16);
 	int length = 0;
 	char *file = map_file(argv[1], &length);
 
 	tick_count start = tick_count::now();
 
 	// Your code here!
-
+	#pragma omp parallel	
+	{
+		#pragma omp for
+		for(int i=0; i<length; i++){
+			file[i]=toupper(file[i]);
+		}
+	}
 	tick_count end = tick_count::now();
 	printf("time = %f seconds\n", (end - start).seconds());  
 }
