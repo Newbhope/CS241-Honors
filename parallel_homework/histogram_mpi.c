@@ -47,6 +47,7 @@ char* map_file(char *filename, int *length_out)
 
 int main(int argc, char *argv[]) 
 {
+
 	int rank, size;
 
 	MPI_Init( &argc, &argv );
@@ -66,6 +67,20 @@ int main(int argc, char *argv[])
 	double start = MPI_Wtime();
 
 	// Your code here! (and maybe elsewhere)
+	unsigned portion[256]={0};
+	int count=0;
+	int total_count=0;
+	for(int i=0; i<size; i++){
+		if(i==rank){
+			for(int j=i*length/size; j<(i+1)*length/size; j++){
+				portion[file[j]]++;
+			}
+		}
+	}
+	for(int i=0; i<256; i++){//to sum up all counts from threads
+		MPI_Reduce(&portion[i], &histogram[i], 1, MPI_UNSIGNED, MPI_SUM, 0, MPI_COMM_WORLD);
+	}
+	//if(rank==0) printf("%d\n", total_count);
 
 	double time = MPI_Wtime() - start;
 	MPI_Reduce(&time, &max_time, 1, MPI_DOUBLE, MPI_MAX, 0, MPI_COMM_WORLD);

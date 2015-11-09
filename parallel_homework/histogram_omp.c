@@ -41,7 +41,8 @@ char* map_file(char *filename, int *length_out)
 
 int main(int argc, char *argv[]) 
 {
-
+	//#pragma omp parallel num_threads(256)
+	//omp_set_num_threads(256);
 	
 	int length = 0;
 	bool print = false;
@@ -56,15 +57,22 @@ int main(int argc, char *argv[])
 	tick_count start = tick_count::now();
 
 	// Your code here!
-	#pragma omp parallel num_threads(256)
-	omp_set_num_threads(256);
-	#pragma omp parallel
+	//omp_lock_t lock;
+	//omp_init_lock(&lock);
+	
+	#pragma omp parallel num_threads(256)//not sure why it doesnt run faster
 	{
-		#pragma omp for
-		for(int i=0; i<length; i++){
+	#pragma omp for
+	for(int i=0; i<length; i++){
+		//omp_set_lock(&lock);
+		//#pragma omp critical //really slows down code but doesnt work correctly unless used	
 			histogram[file[i]]++;
-		}
+		
+		//omp_unset_lock(&lock);
+			}
 	}
+		
+	//omp_destroy_lock(&lock);
 
 	tick_count end = tick_count::now();
 	printf("time = %f seconds\n", (end - start).seconds());  
