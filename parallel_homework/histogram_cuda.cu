@@ -38,6 +38,13 @@ char* map_file(char *filename, int *length_out)
 	*length_out = length;
 	return (char *)file;
 }
+__global__ void count(int length, char* file, unsigned* d_1){
+	int index=blockIdx.x * blockDim.x + threadIdx.x;
+	while(index<length){
+		d_1[ file[index] ]++;
+		index+=blockDim.x * gridDim.x;
+	}
+}
 
 int main(int argc, char *argv[]) 
 {
@@ -54,7 +61,21 @@ int main(int argc, char *argv[])
 	tick_count start = tick_count::now();
 
 	// Your code here! (and maybe elsewhere)
-
+	unsigned* d_1;
+	char* d_2;
+	cudaMalloc( (void**) &d_2, length+1);
+	cudaMalloc( (void**) &d_1, 256*sizeof(unsigned));
+	
+	cudaMemcpy(d_1, histogram, 256*sizeof(unsigned), cudaMemcpyHostToDevice);
+	cudaMemcpy(d_2, file, length+1, cudaMemcpyHostToDevice);
+	
+	count<<<2, 128>>>(length, d_2, d_1);
+	
+	cudaMemcpy(histogram, d_1, 256*sizeof(unsigned), cudaMemcpyDeviceToHost);
+	
+	cudaFree(d_1);
+	cudaFree(d_2);
+	//not getting right values for some reason
 	tick_count end = tick_count::now();
 
 	printf("time = %f seconds\n", (end - start).seconds());  
