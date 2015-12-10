@@ -1,0 +1,46 @@
+Grade report for jpham8
+===============================
+
+Part 1
+
+	(a) [10 / 10] toUpper in OpenMP
+		[6 / 6] for correctness
+		[2 / 2] for time comparable to serial solution
+		[2 / 2] for parallel speedup
+
+	(b) [10 / 10] toUpper in MPI
+		[6 / 6] for correctness
+		[2 / 2] for time comparable to serial solution
+		[2 / 2] for parallel speedup
+
+	(c) [10 / 10] toUpper in CUDA
+		[6 / 6] for correctness
+		[2 / 2] for time comparable to serial solution
+		[2 / 2] for parallel speedup
+
+Part 2
+
+	(a) [5 / 5] Serial histogram
+		[5 / 5] for correctness
+
+	(b) [0 / 15] histogram in OpenMP
+		[0 / 9] for correctness
+		[0 / 3] for time comparable to serial solution
+		[0 / 3] for parallel speedup
+		-15: Your code is not correct. Consider creating a local histogram for each thread
+		and then merging together histograms after each thread has finished on its chunk
+		of the whole file.
+
+	(c) [25 / 25] histogram in MPI
+		[15 / 15] for correctness
+		[5 / 5] for time comparable to serial solution
+		[5 / 5] for parallel speedup
+
+	(d) [15 / 25] histogram in CUDA
+		[15 / 25] for correctness
+		-10: You've got the right idea, but incrementing the histogram is a critical section issue.
+		Consider doing the same thing as with OpenMP: use a collection of small local histograms
+		and merge them together at the end.
+
+
+Total: [75 / 100]
